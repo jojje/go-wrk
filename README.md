@@ -47,16 +47,20 @@ This runs a benchmark for 5 seconds, using 80 go routines (connections)
 
 Output:
 
-    Running 10s test @ http://192.168.1.118:8080/json
+    Running 5s test @ http://192.168.1.118:8080/json
       80 goroutine(s) running concurrently
-       142470 requests in 4.949028953s, 19.57MB read
-         Requests/sec:		28787.47
-         Transfer/sec:		3.95MB
-         Avg Req Time:		0.0347ms
-         Fastest Request:	0.0340ms
-         Slowest Request:	0.0421ms
-         Number of Errors:	0
-
+       756977 requests in 4.552273637s, 83.02MB read
+       Requests/sec:           166285.48
+       Transfer/sec:           18.24MB
+       Number of Errors:       0
+       Request latencies
+         Average:              481.1µs
+         P90:                  1.070638ms
+         P95:                  2.000077ms
+         P99:                  3.000106ms
+         Stdev:                963.693µs
+         Fastest:              121.7µs
+         Slowest:              79.8584ms
 
 Benchmarking Tips
 -----------------
