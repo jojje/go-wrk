@@ -16,7 +16,7 @@ import (
 
 const APP_VERSION = "0.9"
 
-//default that can be overridden from the command line
+// default that can be overridden from the command line
 var versionFlag bool = false
 var helpFlag bool = false
 var duration int = 10 //seconds
@@ -60,7 +60,7 @@ func init() {
 	flag.BoolVar(&http2, "http", true, "Use HTTP/2")
 }
 
-//printDefaults a nicer format for the defaults
+// printDefaults a nicer format for the defaults
 func printDefaults() {
 	fmt.Println("Usage: go-wrk <options> <url>")
 	fmt.Println("Options:")
@@ -146,12 +146,13 @@ func main() {
 			aggStats.TotDuration += stats.TotDuration
 			aggStats.MaxRequestTime = util.MaxDuration(aggStats.MaxRequestTime, stats.MaxRequestTime)
 			aggStats.MinRequestTime = util.MinDuration(aggStats.MinRequestTime, stats.MinRequestTime)
+			aggStats.LatencyStats.UpdateFrom(&stats.LatencyStats)
 			responders++
 		}
 	}
 
 	if aggStats.NumRequests == 0 {
-		fmt.Println("Error: No statistics collected / no requests found\n")
+		fmt.Println("Error: No statistics collected / no requests found\n ")
 		return
 	}
 
@@ -162,6 +163,7 @@ func main() {
 	bytesRate := float64(aggStats.TotRespSize) / avgThreadDur.Seconds()
 	fmt.Printf("%v requests in %v, %v read\n", aggStats.NumRequests, avgThreadDur, util.ByteSize{float64(aggStats.TotRespSize)})
 	fmt.Printf("Requests/sec:\t\t%.2f\nTransfer/sec:\t\t%v\nAvg Req Time:\t\t%v\n", reqRate, util.ByteSize{bytesRate}, avgReqTime)
+	fmt.Printf("Std Rec Time:\t\t%v\n", time.Duration(aggStats.LatencyStats.StdDev()))
 	fmt.Printf("Fastest Request:\t%v\n", aggStats.MinRequestTime)
 	fmt.Printf("Slowest Request:\t%v\n", aggStats.MaxRequestTime)
 	fmt.Printf("Number of Errors:\t%v\n", aggStats.NumErrs)

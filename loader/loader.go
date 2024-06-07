@@ -46,6 +46,7 @@ type RequesterStats struct {
 	TotDuration    time.Duration
 	MinRequestTime time.Duration
 	MaxRequestTime time.Duration
+	LatencyStats   RunningStats
 	NumRequests    int
 	NumErrs        int
 }
@@ -187,6 +188,7 @@ func (cfg *LoadCfg) RunSingleLoadSession() {
 			stats.MaxRequestTime = util.MaxDuration(reqDur, stats.MaxRequestTime)
 			stats.MinRequestTime = util.MinDuration(reqDur, stats.MinRequestTime)
 			stats.NumRequests++
+			stats.LatencyStats.Update(float64(reqDur.Nanoseconds()))
 		} else {
 			stats.NumErrs++
 		}
