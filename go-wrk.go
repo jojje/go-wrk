@@ -132,7 +132,7 @@ func main() {
 	}
 
 	responders := 0
-	aggStats := loader.RequesterStats{MinRequestTime: time.Minute}
+	aggStats := loader.RequesterStats{MinRequestTime: time.Minute, LatencyStats: loader.NewRunningStats()}
 
 	for responders < goroutines {
 		select {
@@ -146,7 +146,7 @@ func main() {
 			aggStats.TotDuration += stats.TotDuration
 			aggStats.MaxRequestTime = util.MaxDuration(aggStats.MaxRequestTime, stats.MaxRequestTime)
 			aggStats.MinRequestTime = util.MinDuration(aggStats.MinRequestTime, stats.MinRequestTime)
-			aggStats.LatencyStats.UpdateFrom(&stats.LatencyStats)
+			aggStats.LatencyStats.UpdateFrom(stats.LatencyStats)
 			responders++
 		}
 	}
@@ -164,6 +164,9 @@ func main() {
 	fmt.Printf("%v requests in %v, %v read\n", aggStats.NumRequests, avgThreadDur, util.ByteSize{float64(aggStats.TotRespSize)})
 	fmt.Printf("Requests/sec:\t\t%.2f\nTransfer/sec:\t\t%v\nAvg Req Time:\t\t%v\n", reqRate, util.ByteSize{bytesRate}, avgReqTime)
 	fmt.Printf("Std Rec Time:\t\t%v\n", time.Duration(aggStats.LatencyStats.StdDev()))
+	fmt.Printf("P90 Rec Time:\t\t%v\n", time.Duration(aggStats.LatencyStats.Quantiles.Quantile(0.9)))
+	fmt.Printf("P95 Rec Time:\t\t%v\n", time.Duration(aggStats.LatencyStats.Quantiles.Quantile(0.95)))
+	fmt.Printf("P99 Rec Time:\t\t%v\n", time.Duration(aggStats.LatencyStats.Quantiles.Quantile(0.99)))
 	fmt.Printf("Fastest Request:\t%v\n", aggStats.MinRequestTime)
 	fmt.Printf("Slowest Request:\t%v\n", aggStats.MaxRequestTime)
 	fmt.Printf("Number of Errors:\t%v\n", aggStats.NumErrs)
